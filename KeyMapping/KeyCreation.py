@@ -1,11 +1,9 @@
 """
-Program to generate based on paper 
+KeyGeneration for Research paper
 
-@author: Ryan Hiltabrand, Dominik Soos
+@authors: Ryan Hiltabrand, Dominik Soos
 """
 
-
-# Imports
 import sys, csv, xlrd, re
 import MySQLdb as sql
 
@@ -42,16 +40,14 @@ def main():
     sixth = ''
 
     # Getting the input file from Trial.csv that we retrieved from citeseerx database
-    # The input file has the format id, title, year
+    # In: Trial.csv has the format id, title, year
     data = csv.reader(open("./Trial.csv"))#, index_col=0)
 
     # skip the header of the csv file
     next(data)
 
-    i = 0
     # loop through each row of input file
     for row in data:
-        i += 1
 
         #print("id", row[0], "title", row[1], "year", row[2])
         print("\n\nid:", row[0] ,"original title: ", row[1])
@@ -65,15 +61,27 @@ def main():
         hawking.execute(auth)
         authors = hawking.fetchall()
 
+
+        # if there are greater than zero authors, get the first author
         if len(authors) > 0:
-            firstAuthor = str(authors[0])
+            # get the first order author for the paper and turn it in to a string
+            query = ("SELECT name FROM authors WHERE paperid = '%s' AND ord = 1" % (paperid))
+            hawking.execute(query)
+            firstAuthor = str(hawking.fetchone())
+            print(firstAuthor)
+
+            # if there are more than one authors, get the second one
+            if len(authors) > 1:
+                query = ("SELECT name FROM authors WHERE paperid = '%s' AND ord = 2" % (paperid))
+                hawking.execute(query)
+                secondAuthor = str(hawking.fetchone())
+                print(secondAuthor)
+            else:
+                secondAuthor = None
         else:
             firstAuthor = None
-        
-        if len(authors) > 1:
-            secondAuthor = str(authors[1])
-        else:
             secondAuthor = None
+
 
 
         # could make it to a function?
@@ -84,14 +92,15 @@ def main():
             match = re.findall(p, title)
             titleList = match
 
+            # get the last name of the first author if exist
             if firstAuthor:
                 match = re.findall(p, firstAuthor)
-                # get the last name of the first author
-                firstAuthor = str(match[-1])
+                firstAuthor = str(match[-1]).lower()
+
+            # get the last name of the second author if exist
             if secondAuthor:
                 match = re.findall(p, secondAuthor)
-                # get the last name of the second author
-                secondAuthor = str(match[-1])
+                secondAuthor = str(match[-1]).lower()
 
         print(firstAuthor, secondAuthor)
 
@@ -171,6 +180,14 @@ def main():
             fifth = ''
             sixth = ''
 
+        three_firstKey = ThreekeyString(first, second, third, firstAuthor)
+        three_secondKey = ThreekeyString(second, third, forth, firstAuthor)
+        three_thirdKey = ThreekeyString(first, second, third, secondAuthor)
+        three_forthKey = ThreekeyString(second, third, forth, secondAuthor)
+
+        print()
+        print("Three\nfirst: ", three_firstKey, "\nsecond:", three_secondKey, "\nthird:", three_thirdKey, "\nfourth:", three_forthKey)
+
         four_firstKey = FourkeyString(first, second, third, forth, firstAuthor)
         four_secondKey = FourkeyString(second, third, forth, fifth, firstAuthor)
         four_thirdKey = FourkeyString(first, second, third, forth, secondAuthor)
@@ -191,32 +208,46 @@ def main():
         print()
 
         if year:
+            chandra.execute("INSERT INTO LongWordsKey (corpus_id, key1, key2, key3, key4, year) VALUES(%s, %s, %s, %s, %s, %s)", (paperid, three_firstKey, three_secondKey, three_thirdKey, three_forthKey, year))
+            db.commit()
             chandra.execute("INSERT INTO FourWordsKey (corpus_id, key1, key2, key3, key4, year) VALUES(%s, %s, %s, %s, %s,%s)", (paperid, four_firstKey, four_secondKey, four_thirdKey, four_forthKey, year))
-        else:
-            chandra.execute("INSERT INTO FourWordsKey (corpus_id, key1, key2, key3, key4) VALUES(%s, %s, %s, %s, %s)", (paperid, four_firstKey, four_secondKey, four_thirdKey, four_forthKey))
-        db.commit()
-
-        if year:
+            db.commit()
             chandra.execute("INSERT INTO FiveWordsKey (corpus_id, key1, key2, key3, key4, year) VALUES(%s, %s, %s, %s, %s,%s)", (paperid, five_firstKey, five_secondKey, five_thirdKey, five_forthKey, year))
+            db.commit()
         else:
+            chandra.execute("INSERT INTO LongWordsKey (corpus_id, key1, key2, key3, key4) VALUES(%s, %s, %s, %s, %s)", (paperid, three_firstKey, three_secondKey, three_thirdKey, three_forthKey))
+            db.commit()
+            chandra.execute("INSERT INTO FourWordsKey (corpus_id, key1, key2, key3, key4) VALUES(%s, %s, %s, %s, %s)", (paperid, four_firstKey, four_secondKey, four_thirdKey, four_forthKey))
+            db.commit()
             chandra.execute("INSERT INTO FiveWordsKey (corpus_id, key1, key2, key3, key4) VALUES(%s, %s, %s, %s, %s)", (paperid, five_firstKey, five_secondKey, five_thirdKey, five_forthKey))
-        db.commit()
-        
-    print(i)
-        
+            db.commit()
+    # end for row in data
+    
+    # Reports
+    chandra.execute("SELECT count(*) FROM LongWordsKey")
+    totalThree = int(chandra.fetchone())
+    print("Total number in LongWordsKey: ", totalThree)
+
+    chandra.execute("SELECT count(*) FROM FourWordsKey")
+    totalFour = int(chandra.fetchone())
+    print("Total number in FourWordsKey: ", totalFour)
+
+    chandra.execute("SELECT count(*) FROM FiveWordsKey")
+    totalFive = int(chandra.fetchone())
+    print("Total number in LongWordsKey: ", totalFive)
+#end main
 
 
 def longestString(List):
     longest_string = max(List, key=len)
     return longest_string
 
-
-def keyString(one, two, three,four):
-    if four == None:
+def ThreekeyString(one, two, three, author):
+    if author == None:
         key = one+'_'+two+'_'+three
         return key
     else:
-        key = one+'_'+two+'_'+three+'_'+four.lower()
+        key = one+'_'+two+'_'+three+'_'+author
         return key
     
 def FourkeyString(one, two, three, four, author):

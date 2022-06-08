@@ -5,8 +5,8 @@ import pandas as pd
 
 def main():
     #compared_file = sys.argv[1]
-    ground_truth_df = pd.read_csv('../groundTruth.csv')
-    compare_df = pd.read_csv('Results/4WordsDuplicates.csv')
+    ground_truth_df = pd.read_csv('./Results/o4WordsTrueDuplicates.csv')
+    compare_df = pd.read_csv('./Results/4WordsDuplicates.csv')
     #print(ground_truth_df)
     #print(compare_df)
 

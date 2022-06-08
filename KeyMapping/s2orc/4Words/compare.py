@@ -5,8 +5,8 @@ import pandas as pd
 
 def main():
     #compared_file = sys.argv[1]
-    ground_truth_df = pd.read_csv('Results/o4WordsTrueDuplicates.csv')
-    compare_df = pd.read_csv('Results/4WordsTrueDuplicates.csv')
+    ground_truth_df = pd.read_csv('../groundTruth.csv')
+    compare_df = pd.read_csv('Results/4WordsDuplicates.csv')
     #print(ground_truth_df)
     #print(compare_df)
 
@@ -48,6 +48,10 @@ def main():
             if x not in TrueNearDuplicates:
                 fp += 1
     print (f"File: True Positives: {tp}   False Positives: {fp}   True Negative: {tn}     False Negatives: {fn}")
+    precision = tp /(tp + fp)
+    recall = tp/(tp + fn)
+
+    print("Precision: ", precision, "\nRecall: ", recall)
 
 if __name__ == "__main__":
 

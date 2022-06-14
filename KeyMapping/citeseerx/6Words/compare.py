@@ -22,7 +22,7 @@ def list_cleaner(dup_list, id):
 
 def main():
     ground_truth_df = pd.read_csv('../GT.csv')
-    compare_df = pd.read_csv('./Results/4WordsDuplicates.csv')
+    compare_df = pd.read_csv('./Results/6WordsDuplicates.csv')
 
     tp = 0
     fp = 0 

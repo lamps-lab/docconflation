@@ -14,9 +14,9 @@ def main():
     csv_header()
 
     r = db.cursor()
-    start = time.process_time()
+    start = time.time()
 
-    File = open(f'./known.txt', 'r')
+    File = open(f'../test.txt', 'r')
     
     cases = []
     for row in File:
@@ -34,7 +34,7 @@ def main():
         r.execute(cur)
         
         current =  r.fetchone()
-        print(current)
+        #print(current)
         #databaseid = current[0]
         paperid = current[1]
         key1 = current[2]
@@ -57,32 +57,48 @@ def main():
         #print(forth_key)
 
         merged = list(set(first_key + second_key + third_key + forth_key))
-        print("unique ids", merged,"\n\n")
+
+        #print("paperid", paperid ,"unique ids", merged,"\n\n")
         
         # if the cluster has more than one unique id's it is a near duplicate
         if len(merged) > 1:
+            # if the paperid is in duplicate list, then remove it
+            if paperid in merged:
+                index = [x for x in range(len(merged)) if merged[x] == paperid] 
+                merged.pop(index[0])
             csv_w(paperid, merged)
+    print("Papers completed")
 
-
-    db.close()
-    end = time.process_time()
-    total = float(start - end)
+    end = time.time()
+    total = float(end - start)
+    
     print("total time: ", total)
-    file2 = open("time3.txt","w")
+    file2 = open("time.txt","w")
     file2.write(f'{total}')
+
     file2.close()
+    r.close()
+    db.close()
 
-
-               
 def csv_w(Ocorpus, Dcourpus):
     #oringinal_corpus = Ocorpus.replace('/n', '')
     with open('Results/4WordsDuplicates.csv', mode='a') as csv_file:
-        fieldNames = ['Corpus', 'Amount' , 'Duplicates']
         #writer = csv.writer(csv_file, delimiter=',', quoting=csv.QUOTE_MINIMAL)
-        writer = csv.DictWriter(csv_file, fieldnames=fieldNames)
-        #row = f'[{str(int(Ocorpus))}], [{str(len(Dcourpus))}], [{str(Dcourpus)}]'
-        writer.writerow({'Corpus': f'{str(int(Ocorpus))}', 'Amount': f'{str(len(Dcourpus))}', 'Duplicates': f'{str(Dcourpus)}'})
-        
+        writer = csv.writer(csv_file)
+        #print(Ocorpus, Dcourpus)
+        colValues = []
+        colValues.append(Ocorpus)
+        colValues.append(len(Dcourpus))
+        toAdd = ""
+        duplicates = ""
+        for x in Dcourpus:
+            toAdd = str(x) + " "
+            duplicates += toAdd
+        #print("duplicates", duplicates)
+        colValues.append(duplicates)
+        writer.writerow(colValues)
+
+
 def csv_header():
     with open('Results/4WordsDuplicates.csv', mode='w') as csv_file:
         fieldNames = ['Corpus' , 'Amount' , 'Duplicates']
@@ -100,7 +116,7 @@ def keyString(key, year):
         for y in range(len(x)):
             keymatches.append(x[y])
     
-    print(keymatches)
+    #print(keymatches)
 
     return keymatches
 

@@ -83,7 +83,6 @@ def main():
             secondAuthor = None
 
 
-
         # could make it to a function?
         # regular expression to get only alphanumerical array of words of authors and title
         # if any of the str is alphanumerical, its returned as list
@@ -102,7 +101,7 @@ def main():
                 match = re.findall(p, secondAuthor)
                 secondAuthor = str(match[-1]).lower()
 
-        print(firstAuthor, secondAuthor)
+        #print(firstAuthor, secondAuthor)
 
         
         if len(titleList) > 5:
@@ -209,18 +208,18 @@ def main():
 
         if year:
             chandra.execute("INSERT INTO LongWordsKey (corpus_id, key1, key2, key3, key4, year) VALUES(%s, %s, %s, %s, %s, %s)", (paperid, three_firstKey, three_secondKey, three_thirdKey, three_forthKey, year))
-            db.commit()
+            #db.commit()
             chandra.execute("INSERT INTO FourWordsKey (corpus_id, key1, key2, key3, key4, year) VALUES(%s, %s, %s, %s, %s,%s)", (paperid, four_firstKey, four_secondKey, four_thirdKey, four_forthKey, year))
-            db.commit()
+            #db.commit()
             chandra.execute("INSERT INTO FiveWordsKey (corpus_id, key1, key2, key3, key4, year) VALUES(%s, %s, %s, %s, %s,%s)", (paperid, five_firstKey, five_secondKey, five_thirdKey, five_forthKey, year))
-            db.commit()
+            #db.commit()
         else:
             chandra.execute("INSERT INTO LongWordsKey (corpus_id, key1, key2, key3, key4) VALUES(%s, %s, %s, %s, %s)", (paperid, three_firstKey, three_secondKey, three_thirdKey, three_forthKey))
-            db.commit()
+            #db.commit()
             chandra.execute("INSERT INTO FourWordsKey (corpus_id, key1, key2, key3, key4) VALUES(%s, %s, %s, %s, %s)", (paperid, four_firstKey, four_secondKey, four_thirdKey, four_forthKey))
-            db.commit()
+            #db.commit()
             chandra.execute("INSERT INTO FiveWordsKey (corpus_id, key1, key2, key3, key4) VALUES(%s, %s, %s, %s, %s)", (paperid, five_firstKey, five_secondKey, five_thirdKey, five_forthKey))
-            db.commit()
+            #db.commit()
     # end for row in data
     
     # Reports
@@ -235,6 +234,10 @@ def main():
     chandra.execute("SELECT count(*) FROM FiveWordsKey")
     totalFive = int(chandra.fetchone())
     print("Total number in LongWordsKey: ", totalFive)
+
+    hawking.close()
+    chandra.close()
+    db.close()
 #end main
 
 

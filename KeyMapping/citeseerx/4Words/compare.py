@@ -1,3 +1,5 @@
+# Program to 
+
 import sys
 import csv
 import numpy as np
@@ -10,12 +12,10 @@ import re
 def list_cleaner(dup_list, id):
     dictionary = {}
     dictionary[id] = []
-    pattern = [r'\w+']
-
 
     for paper in dup_list:
         paper = re.sub('[^0-9.]', '', paper)
-        # regular expression to get only alphanumerical array of words of authors and title
+        # regular expression to get only alphanumerical and dots ('.')  array of words of authors and title
         dictionary[id].append(paper)
     return dictionary
 
@@ -47,60 +47,38 @@ def main():
     #print (allRC)
 
     print(len(reportedIDs))
-    #testFile = open("./test.txt", "w")
+    falseNegative = open("./falseNegatives.txt", "w")
     for index2, j in ground_truth_df.iterrows():
         GT_corpus = j[0]
         trueIDs.append(j[0])
-        #if GT_corpus not in allRC:
-        #    fn += 1
-
-        #testFile.write(str(GT_corpus) + "\n")
+        
         GT_NearDuplicates = j[2]
-        row = compare_df.loc[compare_df['Corpus'] == GT_corpus]
-        if row.dropna(how='all').empty:
-            continue
-
-        #compared_NearDuplicates = row['Duplicates'].values[0]
 
         TrueNearDuplicates = GT_NearDuplicates.split(" ")
 
-
         true_dict = list_cleaner(TrueNearDuplicates, GT_corpus)
-        trueDuplicateList.append(true_dict)
 
-    # end for ground_truth
-    #testFile.close()
-
-    for truedict in trueDuplicateList:
-        for x in truedict:
-            if x not in reportedIDs:
-                fn += 1
-    
-    for reportedict in reportedDuplicateList:
-        for x in reportedict:
-            #print("x: ",x, "reported[x]: ",reportedict[x])
-            
-            if x in trueIDs:
-                for truedict in trueDuplicateList:
-                    for y in truedict:
-                        if reportedict[x] == truedict[y]:
-                            #if reportedict[x] in tr
-                            tp += 1
-            else:
-                fp += 1
-    '''           
-    for paper in trueIDs:
-        #print(paper)
-        if paper in reportedIDs:
-            tp += 1
-        else:
+        if GT_corpus not in reportedIDs:
             fn += 1
-    for paper in reportedIDs:
-        if paper not in trueIDs:
-            fp += 1'''
+            falseNegative.write(str(GT_corpus) + "\n")
+        trueDuplicateList.append(true_dict)
+    # end for ground_truth
+    falseNegative.close()
 
-        #print("true: ", trueIDs)
-        #print("reported: ", reportedIDs)   
+    print("how many trueduplicates? ", len(trueDuplicateList))
+    print("how many reporteduplicates? ", len(reportedDuplicateList))
+    for reportedict in reportedDuplicateList:
+        x = list(reportedict.keys())[0]
+
+        tpfound = 0
+        for truedict in trueDuplicateList:
+            y = list(truedict.keys())[0]
+            if reportedict[x] == truedict[y]:
+                tp += 1
+                tpfound = 1
+                break
+        if tpfound == 0:
+            fp += 1
 
     # Calculations  
     precision = tp /(tp + fp)
@@ -108,7 +86,8 @@ def main():
     f1 = (2 * precision * recall) / (precision + recall)
 
     print (f"File: True Positives: {tp}   False Positives: {fp}   \n True Negative: {tn}     False Negatives: {fn}")
-    print("\nPrecision: ", precision, "\nRecall: ", recall, "\nF1 score: ", f1)
+    print("\nPrecision: ", round(precision, 4), "\nRecall: ", round(recall,4), "\nF1 score: ", round(f1, 4))
+    print()
     print()
 
 if __name__ == "__main__":

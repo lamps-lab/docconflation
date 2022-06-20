@@ -28,7 +28,7 @@ def main():
     # cases holds the id numbers
 
     duplicate_list = []
-    print("all of cases: ", len(cases))
+    print("all of cases in FourWords: ", len(cases))
     for i in cases:
         #ct = datetime.datetime.now()
 
@@ -40,10 +40,10 @@ def main():
         #databaseid = current[0]
         paperid = current[0]
 
-        if paperid in duplicate_list:
-            continue
-        else:
-            duplicate_list.append(paperid)
+        #if paperid in duplicate_list:
+        #    continue
+        #else:
+        duplicate_list.append(paperid)
         
         key1 = current[1]
         key2 = current[2]

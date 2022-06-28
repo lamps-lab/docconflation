@@ -1,7 +1,4 @@
-"""
 
-@author: Dominik Soos
-"""
 import sys
 import datetime
 import re
@@ -20,7 +17,6 @@ def main():
     r = db.cursor()
     start = time.time()
 
-    # input file
     File = open(f'../known.txt', 'r')
 
     cases = []

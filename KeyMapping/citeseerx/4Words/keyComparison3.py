@@ -82,7 +82,7 @@ def main():
     print("Papers completed")
 
     end = time.time()
-    total = float(end - start)
+    total = round(float(end - start), 
     
     print("total time: ", total)
     file2 = open("time.txt","w")

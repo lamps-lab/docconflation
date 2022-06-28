@@ -1,7 +1,3 @@
-"""
-
-@author: Dominik Soos
-"""
 import sys
 import datetime
 import re
@@ -20,8 +16,8 @@ def main():
     r = db.cursor()
     start = time.time()
 
-    # input file
-    File = open(f'../known.txt', 'r')
+    #File = open(f'../known.txt', 'r')
+    File = open(f'./test.txt', 'r')
 
     cases = []
     for row in File:
@@ -32,11 +28,11 @@ def main():
     # cases holds the id numbers
 
     duplicate_list = []
-    print("all of cases in 5 Word: ", len(cases))
+    print("all of cases in FourWords: ", len(cases))
     for i in cases:
         #ct = datetime.datetime.now()
 
-        cur = f"SELECT corpus_id, key1, key2, key3, key4, year FROM  FourWordsKey WHERE corpus_id = '{i}'"
+        cur = f"SELECT corpus_id, key1, key2, key3, key4, year FROM  LongWordsKey WHERE corpus_id = '{i}'"
         r.execute(cur)
         
         current =  r.fetchone()
@@ -98,7 +94,7 @@ def main():
 
 def csv_w(Ocorpus, Dcourpus):
     #oringinal_corpus = Ocorpus.replace('/n', '')
-    with open('Results/5WordsDuplicates.csv', mode='a') as csv_file:
+    with open('Results/4WordsDuplicates.csv', mode='a') as csv_file:
         #writer = csv.writer(csv_file, delimiter=',', quoting=csv.QUOTE_MINIMAL)
         writer = csv.writer(csv_file)
         #print(Ocorpus, Dcourpus)
@@ -119,7 +115,7 @@ def csv_w(Ocorpus, Dcourpus):
 
 
 def csv_header():
-    with open('Results/5WordsDuplicates.csv', mode='w') as csv_file:
+    with open('Results/4WordsDuplicates.csv', mode='w') as csv_file:
         fieldNames = ['Corpus' , 'Amount' , 'Duplicates']
         writer = csv.DictWriter(csv_file, fieldnames=fieldNames)
         writer.writeheader()       
@@ -127,7 +123,7 @@ def csv_header():
 def keyString(key, year):
     keymatches = []
     mycursor = db.cursor()
-    key_string = f'SELECT corpus_id FROM  FourWordsKey WHERE year = "{year}" AND (key1 = "{key}" OR key2 = "{key}" OR key3 = "{key}" OR key4 = "{key}")'
+    key_string = f'SELECT corpus_id FROM  LongWordsKey WHERE year = "{year}" AND (key1 = "{key}" OR key2 = "{key}" OR key3 = "{key}" OR key4 = "{key}")'
 
     mycursor.execute(key_string)
     result = mycursor.fetchall()

@@ -9,42 +9,28 @@ from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
 import MySQLdb as sql
 import time
+import config
 
-db=sql.connect(host = "chandra.cs.odu.edu", user = "", passwd = "", db = "s2orc_2020", charset = "utf8")
-#db=mysql.connector.connect(host = "chandra.cs.odu.edu", user = "rhiltabrand", passwd = "WedSep2211:36:18AM", db = "s2orc_2020", charset = "utf8")
+db=sql.connect(host = config.host, user = config.user, passwd = config.passwd, db = config.db, charset = "utf8")
 
-def get_time():
-    x = datetime.datetime.now()
-    print(x) 
 
 def main():
     csv_header()
     r = db.cursor()
-    StartTime = datetime.datetime.now()
-    get_time()
-    elapsed_time = 0
-    #r.execute(f"SELECT corpus_id, title, authors, year, field FROM s2orcDATA")
-    #df = pd.DataFrame(r.fetchall(), columns = ['corpus_id', 'title', 'authors', 'year', 'field'])
-    
-    #df = pd.read_csv('/data/rhiltabr/s2/S2ORC_RESEARCH/DocumentConflation_Comparisons/trial.csv')
-    #df = pd.read_csv('/data/rhiltabr/s2/S2ORC_RESEARCH/DocumentConflation_Comparisons/yearTrial4.csv')
-    df = pd.read_csv('/data/rhiltabr/s2/S2ORC_RESEARCH/DocumentConflation_Comparisons/NEWyearTrial.csv')
-    
-    #df = pd.read_csv('../s2orc.csv')
+    start = time.time()
+
+    df = pd.read_csv('../testFiles/NEWyearTrial.csv')
+
     df['year'] = df['year'].fillna(0.0).astype(int)
     df.set_index('year')
     df.set_index('field')
-    print(df)
-    get_time()
 
-    #file1 = '/data/rhiltabr/s2/S2ORC_RESEARCH/DocumentConflation_Comparisons/test.txt'
-    file1 = '/data/rhiltabr/s2/S2ORC_RESEARCH/DocumentConflation_Comparisons/known.txt'
-    #file1 = '/data/rhiltabr/s2/S2ORC_RESEARCH/DocumentConflation_Comparisons/kno4.txt'
+    file1 = '../testFiles/known.txt'
 
     with open(file1) as f1:
         for x in f1:
-            c = x.replace('\n','')
-            original = f"SELECT title, authors, year, field FROM s2orcDATA WHERE corpus_id = {c}"
+            paperid = x.replace('\n','')
+            original = f"SELECT title, authors, year, field FROM s2orcDATA WHERE corpus_id = {paperid}"
             r.execute(original)
             t = time.process_time()
             Ori =  r.fetchone()
@@ -52,39 +38,34 @@ def main():
             oAuthor = Ori[1]
             oYear = Ori[2]
             oField = Ori[3]
-            
-                
+                       
             oAuthor = re.sub(' +', ' ', oAuthor)
-            oAuthorList = oAuthor.split(',')
-
-            #print(oTitle)
-            #print(c)
-            #print(oAuthorList)
-                
-            #print(x)
-            #print(type(f2list))
-            new = 0    
+  
             matches = []
-            #for index, z in df.loc[df['year'] == oYear].iterrows():
+
             for index, z in df.iterrows():           
                 dCorpus = z['corpus_id']
                 dTitle = z['title']
-                #dAuthor = z['authors']
-                #dAuthor = re.sub(' +', ' ', dAuthor)
-                #dAuthorList = dAuthor.split(',')
-                print (z)
+
                 if fuzzy_score(oTitle, dTitle) > 95:
                     print (dCorpus)
                     matches.append(dCorpus)
                     
-            if(len(matches) > 1):  
-                print(matches)   
-                csv_w(c, matches)
-            elapsed_time = (time.process_time() - t) + elapsed_time
-    EndTime = datetime.datetime.now()
-    file2 = open("time95.txt","a")
-    file2.write(elapsed_time)
-    print(StartTime, EndTime, elapsed_time)
+            # if the cluster has more than one unique id's it is a near duplicate
+            if len(matches) > 1:
+                # if the paperid is in duplicate list, then remove it
+                if paperid in matches:
+                    index = [x for x in range(len(matches)) if matches[x] == paperid] 
+                    matches.pop(index[0])
+                csv_w(paperid, matches)
+
+    end = time.time()
+    total = float(end - start)
+    file2 = open("time85.txt","w")
+    file2.write(total)
+    file2.close()
+    r.close()
+    db.close()
 
                 
 def fuzzy_score(Otitle, Dtitle):

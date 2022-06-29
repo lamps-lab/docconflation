@@ -1,7 +1,7 @@
 from datasketch import MinHash, MinHashLSH
 import pandas as pd
 import csv
-import datetime
+import time
 import pickle
 
 CSVtitle = 'initialRun.csv'
@@ -9,12 +9,7 @@ CSVtitle = 'initialRun.csv'
 def create_shingles(doc, k):
     """
     Creates shingles and stores them in sets
-    
-    Paramaters
     ----------
-
-    Returns
-    -------
     """
     shingled_set = set() # create an empty set
     
@@ -28,15 +23,6 @@ def create_shingles(doc, k):
     return shingled_set
 
 def csv_w(Ocorpus, Dcourpus):
-    """
-    
-    
-    Paramaters
-    ----------
-
-    Returns
-    -------
-    """
     oringinal_corpus = Ocorpus.replace('/n', '')
     with open(CSVtitle, mode='a') as csv_file:
         fieldNames = ['Corpus', 'Amount' , 'Duplicates']
@@ -46,23 +32,14 @@ def csv_w(Ocorpus, Dcourpus):
         #print(row)
         
 def csv_header():
-    """
-    
-    
-    Paramaters
-    ----------
-
-    Returns
-    -------
-    """
     with open(CSVtitle, mode='w') as csv_file:
         fieldNames = ['Corpus' , 'Amount' , 'Duplicates']
         writer = csv.DictWriter(csv_file, fieldnames=fieldNames)
 
 
 csv_header()
-StartTime = datetime.datetime.now()
-df = pd.read_csv('NEWyearTrial.csv')
+start = time.time()
+df = pd.read_csv('../testFiles/NEWyearTrial.csv')
 
 d={}    
 with_wildcard = False
@@ -81,7 +58,7 @@ for index, z in df.iterrows():
     lsh.insert(f"{Corpus}", d["{0}".format(Corpus)])
     #print(Corpus)
 
-TestFile = 'known.txt'
+TestFile = '../testFiles/known.txt'
 
 with open(TestFile) as f:
     test = f.readlines()
@@ -92,8 +69,11 @@ for y in test:
         results = [int(x) for x in results]
         csv_w(y, results)
 
-EndTime = datetime.datetime.now()
-print(EndTime-StartTime)
+end = time.time()
+total = float(end - start)
+print(total)
+
+
 data = pickle.dumps(lsh)
 dfile = open("data", "wb")
 dfile.write(data)
@@ -114,7 +94,7 @@ def csv_header1():
         fieldNames = ['Corpus' , 'Amount' , 'Duplicates']
         writer = csv.DictWriter(csv_file, fieldnames=fieldNames)
 
-start = datetime.datetime.now()
+start = time.time()
 
 rfile = open("data", "rb")
 lsh_loaded = pickle.load(rfile)
@@ -128,4 +108,6 @@ for y in test:
         results = [int(x) for x in results]
         csv_w1(y, results)
 
-print(datetime.datetime.now() - start)
+end = time.time()
+total = float(end - start)
+print(total)

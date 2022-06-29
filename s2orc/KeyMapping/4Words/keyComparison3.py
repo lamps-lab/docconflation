@@ -16,7 +16,7 @@ def main():
     r = db.cursor()
     start = time.time()
 
-    File = open(f'../test.txt', 'r')
+    File = open(f'./known.txt', 'r')
     
     cases = []
     for row in File:
@@ -25,40 +25,28 @@ def main():
     File.close()
     
     # cases holds the id numbers
-
     print("all of cases: ", len(cases))
     for i in cases:
-        #ct = datetime.datetime.now()
+
 
         cur = f"SELECT database_id, corpus_id, key1, key2, key3, key4, year FROM  LongWordsKeys WHERE corpus_id = {i}"
         r.execute(cur)
         
         current =  r.fetchone()
-        #print(current)
-        #databaseid = current[0]
+
         paperid = current[1]
         key1 = current[2]
         key2 = current[3]
         key3 = current[4]
         key4 = current[5]
         year = current[6]
-
-        #print("Key1",key1, "Key2", key2, "Key3", key3, "Key4", key4)
-
-        #print("current time:-", ct)
         
-        first_key = keyString(key1, year)
-        #print(first_key)   
+        first_key = keyString(key1, year) 
         second_key = keyString(key2, year) 
-        #print(second_key)
         third_key = keyString(key3, year)
-        #print(third_key)
         forth_key = keyString(key4, year)
-        #print(forth_key)
 
         merged = list(set(first_key + second_key + third_key + forth_key))
-
-        #print("paperid", paperid ,"unique ids", merged,"\n\n")
         
         # if the cluster has more than one unique id's it is a near duplicate
         if len(merged) > 1:

@@ -36,7 +36,7 @@ def csv_header():
 csv_header()
 StartTime = datetime.datetime.now()
 
-df = pd.read_csv('../TrialAbstract.csv')
+df = pd.read_csv('../testFiles/TrialAbstract.csv')
 
 
 d={}    
@@ -54,7 +54,7 @@ for index, z in df.iterrows():
     lsh.insert(f"{id}", d["{0}".format(id)])
     print(id)
     
-TestFile = '../abstractKnown.txt'
+TestFile = '../testFiles/abstractKnown.txt'
 
 with open(TestFile) as f:
     test = f.readlines()

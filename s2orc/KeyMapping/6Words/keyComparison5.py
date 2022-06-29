@@ -47,20 +47,20 @@ def main():
 
         #print("current time:-", ct)
         
-        first_key = keyString(key1, year)
-        #print(first_key)   
+        first_key = keyString(key1, year) 
         second_key = keyString(key2, year) 
-        #print(second_key)
         third_key = keyString(key3, year)
-        #print(third_key)
         forth_key = keyString(key4, year)
-        #print(forth_key)
 
         merged = list(set(first_key + second_key + third_key + forth_key))
         #print("unique ids", merged,"\n\n")
         
         # if the cluster has more than one unique id's it is a near duplicate
         if len(merged) > 1:
+            # if the paperid is in duplicate list, then remove it
+            if paperid in merged:
+                index = [x for x in range(len(merged)) if merged[x] == paperid] 
+                merged.pop(index[0])
             csv_w(paperid, merged)
     print("Papers completed")
 

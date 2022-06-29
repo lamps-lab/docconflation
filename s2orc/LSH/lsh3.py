@@ -3,7 +3,7 @@ import kshingle as ks
 #import MySQLdb as sql
 import pandas as pd
 import csv
-import datetime
+import time
 
 CSVtitle = 'Results/.9J10k256permTrueDuplicates.csv'
 def csv_w(Ocorpus, Dcourpus):
@@ -22,8 +22,8 @@ def csv_header():
 
 
 csv_header()
-StartTime = datetime.datetime.now()
-df = pd.read_csv('/data/rhiltabr/s2/S2ORC_RESEARCH/DocumentConflation_Comparisons/NEWyearTrial.csv')
+start = time.time()
+df = pd.read_csv('../testFiles/NEWyearTrial.csv')
 
 d={}    
 with_wildcard = False
@@ -39,8 +39,8 @@ for index, z in df.iterrows():
         d["{0}".format(Corpus)].update(shingle.encode('utf8'))
     lsh.insert(f"{Corpus}", d["{0}".format(Corpus)])
     print(Corpus)
-#TestFile = '/data/rhiltabr/s2/S2ORC_RESEARCH/DocumentConflation_Comparisons/test.txt'
-TestFile = '/data/rhiltabr/s2/S2ORC_RESEARCH/DocumentConflation_Comparisons/known.txt'
+
+TestFile = '../testFiles/known.txt'
 
 with open(TestFile) as f:
     test = f.readlines()
@@ -52,6 +52,7 @@ for y in test:
         results = [int(x) for x in results]
         csv_w(y, results)
 
-EndTime = datetime.datetime.now()
+end = time.time()
+total = float(end - start)
 
-print(StartTime, EndTime)
+print(total)

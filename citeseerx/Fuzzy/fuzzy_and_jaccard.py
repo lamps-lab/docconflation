@@ -9,8 +9,9 @@ from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
 import MySQLdb as sql
 import time
+import config
 
-db=sql.connect(host = "hawking.cs.odu.edu", user = "rhiltabrand", passwd = "Bigblue22.", db = "citeseerx", charset = "utf8")
+db=sql.connect(host = config.hawkingh, user = config.hawkingu, passwd = config.hawkingp, db = config.hawkingdb, charset = "utf8")
 
 def get_time():
     x = datetime.datetime.now()

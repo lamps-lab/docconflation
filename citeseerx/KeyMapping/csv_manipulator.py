@@ -1,5 +1,9 @@
+# Dominik Soos
+# Program to remove the paperid from duplicate list
+
 import os
 import csv
+
 
 def main():
     

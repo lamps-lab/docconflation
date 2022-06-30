@@ -1,5 +1,5 @@
 """
-KeyGeneration for Research paper
+KeyGeneration for Document Conflation method Key mapping
 
 @authors: Ryan Hiltabrand, Dominik Soos
 """
@@ -49,8 +49,7 @@ def main():
     # loop through each row of input file
     for row in data:
 
-        #print("id", row[0], "title", row[1], "year", row[2])
-        print("\n\nid:", row[0] ,"original title: ", row[1])
+        #print("\n\nid:", row[0] ,"original title: ", row[1])
         
         paperid = row[0]
         title = row[1].lower()

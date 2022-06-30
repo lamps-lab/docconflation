@@ -20,49 +20,47 @@ def get_time():
 def main():
     csv_header()
     r = db.cursor()
-    StartTime = datetime.datetime.now()
-    get_time()
-    elapsed_time = 0
+    start = time.time()
     
-    df = pd.read_csv('../Trial.csv')
+    df = pd.read_csv('../testFiles/Trial.csv')
     
     df['year'] = df['year'].fillna(0.0).astype(int)
     df.set_index('year')
-    #df.set_index('field')
-    print(df)
-    get_time()
 
-    file1 = '../known.txt'
+    file1 = '../testFiles/known.txt'
 
     with open(file1) as f1:
         for x in f1:
-            c = x.replace('\n','')
-            original = f"SELECT title, year FROM papers WHERE id = '{c}'" #need to change
+            paperid = x.replace('\n','')
+            original = f"SELECT title, year FROM papers WHERE id = '{paperid}'"
             r.execute(original)
             t = time.process_time()
             Ori =  r.fetchone()
             oTitle = Ori[0]
             oYear = Ori[1]
 
-            new = 0    
             matches = []
             
             for index, z in df.iterrows():           
-                dCorpus = z['id'] #needToChange
-                dTitle = z['title'] #needToChange
-                
-                print (z)
+                dCorpus = z['id']
+                dTitle = z['title']
+
                 if fuzzy_score(oTitle, dTitle) > 80:
-                    print (dCorpus)
                     matches.append(dCorpus)
                     
-            if(len(matches) > 1):  
-                print(matches)   
-                csv_w(c, matches)
-            elapsed_time = (time.process_time() - t) + elapsed_time
-    EndTime = datetime.datetime.now()
+            # if the cluster has more than one unique id's it is a near duplicate
+            if len(matches) > 1:
+                # if the paperid is in duplicate list, then remove it
+                if paperid in matches:
+                    index = [x for x in range(len(matches)) if matches[x] == paperid] 
+                    matches.pop(index[0])
+                csv_w(paperid, matches)
+    end = time.time()
+    total = float(end - start)
+    print(total)
 
-    print(StartTime, EndTime, elapsed_time)
+    r.close()
+    db.close()
 
                 
 def fuzzy_score(Otitle, Dtitle):

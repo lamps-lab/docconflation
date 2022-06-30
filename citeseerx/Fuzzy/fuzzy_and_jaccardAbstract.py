@@ -9,61 +9,55 @@ from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
 import MySQLdb as sql
 import time
+import config
 
-db=sql.connect(host = "hawking.cs.odu.edu", user = "rhiltabrand", passwd = "Bigblue22.", db = "citeseerx", charset = "utf8")
-
-def get_time():
-    x = datetime.datetime.now()
-    print(x) 
+db=sql.connect(host = config.hawkingh, user = config.hawkingu, passwd = config.hawkingp, db = config.hawkingdb, charset = "utf8")
 
 def main():
     csv_header()
     r = db.cursor()
-    StartTime = datetime.datetime.now()
-    get_time()
-    elapsed_time = 0
+    start = time.time()
     
-    df = pd.read_csv('/data/rhiltabr/s2/S2ORC_RESEARCH/DocumentConflation_Comparisons/citeseerx/TrialAbstract.csv')
+    df = pd.read_csv('../testFiles/TrialAbstract.csv')
     
     df['year'] = df['year'].fillna(0.0).astype(int)
     df.set_index('year')
-    #df.set_index('field')
-    print(df)
-    get_time()
 
-    file1 = '/data/rhiltabr/s2/S2ORC_RESEARCH/DocumentConflation_Comparisons/citeseerx/known.txt'
+
+    file1 = '../testFiles/known.txt'
 
     with open(file1) as f1:
         for x in f1:
-            c = x.replace('\n','')
-            original = f"SELECT abstract, year FROM papers WHERE id = '{c}'" #need to change
+            paperid = x.replace('\n','')
+            original = f"SELECT abstract, year FROM papers WHERE id = '{paperid}'" #need to change
             r.execute(original)
-            t = time.process_time()
+
             Ori =  r.fetchone()
             oAbstract = Ori[0]
             oYear = Ori[1]
-
-            new = 0    
+   
             matches = []
             
             for index, z in df.iterrows():           
                 dCorpus = z['id'] #needToChange
                 dAbstract = z['abstract'] #needToChange
-                
-                #print (z)
-                print(f'{c}: {oAbstract}')
-                print(f'{dCorpus}: {dAbstract}')
+
                 if fuzzy_score(oAbstract, dAbstract) > 90:
-                    print (dCorpus)
                     matches.append(dCorpus)
                     
-            if(len(matches) > 1):  
-                print(matches)   
-                csv_w(c, matches)
-            elapsed_time = (time.process_time() - t) + elapsed_time
-    EndTime = datetime.datetime.now()
+            # if the cluster has more than one unique id's it is a near duplicate
+            if len(matches) > 1:
+                # if the paperid is in duplicate list, then remove it
+                if paperid in matches:
+                    index = [x for x in range(len(matches)) if matches[x] == paperid] 
+                    matches.pop(index[0])
+                csv_w(paperid, matches)
+    end = time.time()
+    total = float(end - start)
+    print(total)
 
-    print(StartTime, EndTime, elapsed_time)
+    r.close()
+    db.close()
 
                 
 def fuzzy_score(oAbstract, dAbstract):

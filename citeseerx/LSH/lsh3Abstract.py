@@ -3,9 +3,7 @@ import kshingle as ks
 #import MySQLdb as sql
 import pandas as pd
 import csv
-import datetime
-
-
+import time
 
 Thresh = 0.9
 Perm = 128
@@ -33,9 +31,9 @@ def csv_header():
 
 
 csv_header()
-StartTime = datetime.datetime.now()
+start = time.time()
 
-df = pd.read_csv('/data/rhiltabr/s2/S2ORC_RESEARCH/DocumentConflation_Comparisons/citeseerx/TrialAbstract.csv')
+df = pd.read_csv('../testFiles/TrialAbstract.csv')
 
 
 d={}    
@@ -53,7 +51,7 @@ for index, z in df.iterrows():
     lsh.insert(f"{id}", d["{0}".format(id)])
     print(id)
     
-TestFile = '/data/rhiltabr/s2/S2ORC_RESEARCH/DocumentConflation_Comparisons/citeseerx/known.txt'
+TestFile = '../testFiles/known.txt'
 
 with open(TestFile) as f:
     test = f.readlines()
@@ -66,6 +64,7 @@ for y in test:
         results = [x for x in results]
         csv_w(y, results)
 
-EndTime = datetime.datetime.now()
+end = time.time()
+total = float(end - start)
 
-print(StartTime, EndTime)
+print(total)

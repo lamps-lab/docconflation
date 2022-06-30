@@ -7,63 +7,55 @@ import numpy as np
 import pandas as pd
 import time
 import MySQLdb as sql
+import config
 
-db=sql.connect(host = "hawking.cs.odu.edu", user = "rhiltabrand", passwd = "Bigblue22.", db = "citeseerx", charset = "utf8")
+db=sql.connect(host = config.hawkingh, user = config.hawkingu, passwd = config.hawkingp, db = config.hawkingdb, charset = "utf8")
 
-def get_time():
-    x = datetime.datetime.now()
-    print(x) 
 
 def main():
     csv_header()
     r = db.cursor()
-    i = 0
     
-    file1 = '/data/rhiltabr/s2/S2ORC_RESEARCH/DocumentConflation_Comparisons/citeseerx/known.txt'
-    df = pd.read_csv('/data/rhiltabr/s2/S2ORC_RESEARCH/DocumentConflation_Comparisons/citeseerx/Trial.csv')
+    file1 = '../testFiles/known.txt'
+    df = pd.read_csv('../testFiles/Trial.csv')
     df_i = df.set_index('id')
-    #print(df_i)
-    StartTime = datetime.datetime.now()
-    elapsed_time = 0
+
+    start = time.time()
+
     with open(file1) as f1:
         for x in f1:
-            i += 1
-            
             matches = []
-            c = x.replace('\n','')
-            original = f"SELECT title, year FROM papers WHERE id = '{c}'"
-            print(original)
+            paperid = x.replace('\n','')
+            original = f"SELECT title, year FROM papers WHERE id = '{paperid}'"
             r.execute(original)
-            
-            t = time.process_time()
             
             Ori =  r.fetchone()
             oTitle = re.sub(r'[^A-Za-z0-9 ]+', '', Ori[0])
-            #oTitle = Ori[0]
-            oYear = Ori[1]
-            #oField = Ori[2]
-            #print(oTitle)
-            #df1 = df_i[df['title'].str.match(oTitle)]
+
             df1 = df_i['title'].str.match(oTitle)
             data = df1.to_frame()
             data.columns = ['bool']
-            #print(data)
+
             for index, z in data.loc[data['bool'] == True].iterrows():
                 print (index)
                 matches.append(index)
-                """if len(df1) > 1:
-                print (df1['corpus_id'])
-                for index, z in df1.iterrows():
-                    matches.append(z['corpus_id'].item())"""
+
+            # if the cluster has more than one unique id's it is a near duplicate
             if len(matches) > 1:
-                csv_w(c, matches)
+                # if the paperid is in duplicate list, then remove it
+                if paperid in matches:
+                    index = [x for x in range(len(matches)) if matches[x] == paperid] 
+                    matches.pop(index[0])
+                csv_w(paperid, matches)
             
             del df1
-            i += 1
-            elapsed_time = (time.process_time() - t) + elapsed_time
-    EndTime = datetime.datetime.now()
 
-    print(StartTime, EndTime, elapsed_time)
+    end = time.time()
+    total = float(start - end)
+    print(total)
+    r.close()
+    db.close()
+
             
 
             

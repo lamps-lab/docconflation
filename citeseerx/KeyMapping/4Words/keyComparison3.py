@@ -16,8 +16,8 @@ def main():
     r = db.cursor()
     start = time.time()
 
-    #File = open(f'../known.txt', 'r')
-    File = open(f'./test.txt', 'r')
+    #File = open(f'../../testFiles/known.txt', 'r')
+    File = open(f'../../testFiles/test.txt', 'r')
 
     cases = []
     for row in File:
@@ -27,23 +27,15 @@ def main():
     
     # cases holds the id numbers
 
-    duplicate_list = []
     print("all of cases in FourWords: ", len(cases))
     for i in cases:
-        #ct = datetime.datetime.now()
 
         cur = f"SELECT corpus_id, key1, key2, key3, key4, year FROM  LongWordsKey WHERE corpus_id = '{i}'"
         r.execute(cur)
         
         current =  r.fetchone()
-        #print(current)
-        #databaseid = current[0]
-        paperid = current[0]
 
-        #if paperid in duplicate_list:
-        #    continue
-        #else:
-        duplicate_list.append(paperid)
+        paperid = current[0]
         
         key1 = current[1]
         key2 = current[2]
@@ -51,22 +43,12 @@ def main():
         key4 = current[4]
         year = current[5]
 
-        #print("Key1",key1, "Key2", key2, "Key3", key3, "Key4", key4)
-
-        #print("current time:-", ct)
-        
-        first_key = keyString(key1, year)
-        #print(first_key)   
+        first_key = keyString(key1, year) 
         second_key = keyString(key2, year) 
-        #print(second_key)
         third_key = keyString(key3, year)
-        #print(third_key)
         forth_key = keyString(key4, year)
-        #print(forth_key)
 
         merged = list(set(first_key + second_key + third_key + forth_key))
-
-        #print("paperid", paperid ,"unique ids", merged,"\n\n")
         
         # if the cluster has more than one unique id's it is a near duplicate
         if len(merged) > 1:
@@ -74,9 +56,6 @@ def main():
             if paperid in merged:
                 index = [x for x in range(len(merged)) if merged[x] == paperid] 
                 merged.pop(index[0])
-            # add each duplicate to the duplicate array
-            for paper in merged:
-                duplicate_list.append(paper)
             # write result in a new line
             csv_w(paperid, merged)
     print("Papers completed")

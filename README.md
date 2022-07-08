@@ -1,7 +1,9 @@
 # Document Conflation
 We use four methods to check the accuracy for near duplicates in two datasets: 
-* S2ORC
-* CiteSeerX  
+* S2ORC  
+S2ORC is one of the largest open-access scholarly big datasets with more than 130 million scholarly papers records with their unique IDs. If the paper is found in another database, the two documents are linked by adding the external database ID as a metadata field of the S2ORC paper. In S2ORC, each paper has a unique ID. If the paper is found in another database, the two documents are linked by adding the external database ID as a metadata field of the S2ORC paper.  
+* CiteSeerX
+CiteSeerX has 10 million full-text papers with 77 million citation records and it has been proven as a powerful resource in many data mining, machine learning and information retrieval applications that use rich metadata.  
 The performance for each method is evaluated using precision, recall and F1-score.
 A true positive (TP) is a near-duplicate paper predicted by a method and in a cluster of the ground truth. 
 
@@ -11,12 +13,10 @@ A true positive (TP) is a near-duplicate paper predicted by a method and in a cl
 
 ## Key-Mapping
 * Key-mapping is a conflation method used by CiteSeerX.
-* In this method, several keys are generated for each
-paper by concatenating a portion of title and author information.  
+* In this method, several keys are generated for each paper by concatenating a portion of title and author information.  
 
 ## Locality Sensitive Hashing (LSH)
-* LSH is an algorithm that breaks an input string into pieces (shingles) and hashes similar strings
-into the same “buckets’ with high probability.
+* LSH is an algorithm that breaks an input string into pieces (shingles) and hashes similar strings into the same “buckets’ with high probability.
 * It has been used as an efficient method to resolve near-duplicate news articles.  
 
 ## Strict Title

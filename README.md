@@ -1,9 +1,9 @@
 # Document Conflation
-We use four methods to check the accuracy for near duplicates in two datasets: 
-* S2ORC  
-S2ORC is one of the largest open-access scholarly big datasets with more than 130 million scholarly papers records with their unique IDs. If the paper is found in another database, the two documents are linked by adding the external database ID as a metadata field of the S2ORC paper. In S2ORC, each paper has a unique ID. If the paper is found in another database, the two documents are linked by adding the external database ID as a metadata field of the S2ORC paper.  
-* CiteSeerX
-CiteSeerX has 10 million full-text papers with 77 million citation records and it has been proven as a powerful resource in many data mining, machine learning and information retrieval applications that use rich metadata.  
+We quantitatively compared four near-duplicate detection methods using the ground truth created from S2ORC and CiteSeerX.
+* ## S2ORC   
+S2ORC is one of the largest open-access scholarly big datasets with 136M+ paper nodes with 12.7M+ full-text papers connected by 467M+ citation edges by unifying data from different sources. If the paper is found in another database, the two documents are linked by adding the external database ID as a metadata field of the S2ORC paper. In S2ORC, each paper has a unique ID. If the paper is found in another database, the two documents are linked by adding the external database ID as a metadata field of the S2ORC paper.  
+* ## CiteSeerX
+CiteSeerX has 10 million full-text papers with 77 million citation records and it has been proven as a powerful resource in many data mining, machine learning and information retrieval applications that use rich metadata. 
 The performance for each method is evaluated using precision, recall and F1-score.
 A true positive (TP) is a near-duplicate paper predicted by a method and in a cluster of the ground truth. 
 
